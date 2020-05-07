@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML5 Canvas</title>
+</head>
+
+<body>
+    <canvas id="draw" width="800" height="800"></canvas>
+    <script>
+        // Grab the canvas element - default is 800px by 800px;
+        const canvas = document.querySelector('#draw');
+        // Context is 2D or 3D and is what is actually drawn on 
+        const ctx = canvas.getContext('2d');
+        // Change canvas from default size to full window size
+        canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth;
+        // Neccessary elements below need to be specified for drawing lines
+        ctx.strokeStyle = '#BADASS';
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 15;
+        // Fun way to blend colors together with globalCompositOperation values
+        ctx.globalCompositeOperation = 'multiply';
+
+        // Make variable to track whether the mouse has been flagged up or down to enable drawing on canvas
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let hue = 0;
+        let direction = true;
+
+        // Draw Function
+        // Stop the function from running when the mouse has not been triggered
+        function draw(e) {
+            if (!isDrawing) return;
+
+            console.log(e);
+            ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+
+            // Update lastX and Y variables
+            lastX = e.offsetX;
+            lastY = e.offsetY;
+
+            // Increment the hue for every pixel drawn - note that HSL can exceed 360 and will still work the same
+            hue++;
+            // Increment the line width - if it exceeds 100 or is less than 1, flip the direction so line width is always between 1-100px      
+            if (ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+                direction = !direction;
+            }
+            if (direction) {
+                ctx.lineWidth++;
+            } else {
+                ctx.lineWidth--;
+            }
+        }
+
+        // Event listeners for various mouse states
+
+        // Initial click required to start draw function, rather than always start at coordinates 0,0
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            // Update lastX and Y variables
+            lastX = e.offsetX;
+            lastY = e.offsetY;
+        });
+
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mouseout', () => isDrawing = false);
+    </script>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+        }
+    </style>
+
+</body>
+
+</html>
